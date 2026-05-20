@@ -18,7 +18,9 @@ public class RabbitMqPublisher  : IMessagePublisher
         var factory = new ConnectionFactory()
         {
             HostName = host,
-            Port = Convert.ToInt32(port)
+            Port = Convert.ToInt32(port),
+            UserName = configuration["RabbitMQ:Username"],
+            Password = configuration["RabbitMQ:Password"]
         };
 
 
