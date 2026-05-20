@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: documentservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: documentservice
+  template:
+    metadata:
+      labels:
+        app: documentservice
+    spec:
+      containers:
+      - name: documentservice
+        image: your-image
+        ports:
+        - containerPort: 8080

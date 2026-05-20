@@ -1,28 +1,34 @@
-# docflow-document-service
+# DocFlow.DocumentService
 
-Enterprise AI Document Processing Platform component.
+Enterprise-grade microservice generated using the Enterprise Platform Template.
 
-## Purpose
+## Features
 
-Describe the purpose of this service here.
-
-## Architecture
-
-- .NET 8
-- Docker
-- RabbitMQ
 - Clean Architecture
-- CI/CD
-- Observability
+- OpenTelemetry
+- Health Checks
+- Serilog + Seq
+- RabbitMQ
+- Docker
+- GitHub Actions
+- Terraform
+- Kubernetes
+- Integration Tests
 
-## Local Development
+## Running Locally
 
-TBD
+`ash
+ docker compose up --build
+`
 
 ## Running Tests
 
-TBD
+`ash
+ dotnet test
+`
 
-## CI/CD
+## Health Check
 
-TBD
+`ash
+ /health
+`

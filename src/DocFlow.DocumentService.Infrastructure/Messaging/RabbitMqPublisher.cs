@@ -1,0 +1,41 @@
+﻿using DocFlow.DocumentService.Application.Interfaces;
+using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
+using System.Text;
+using System.Text.Json;
+
+namespace DocFlow.DocumentService.Infrastructure.Messaging;
+
+public class RabbitMqPublisher  : IMessagePublisher
+{
+    private readonly IConnection _connection;
+
+    public RabbitMqPublisher(IConfiguration configuration)
+    {
+        var host = configuration["RabbitMQ:Host"];
+        var port = configuration["RabbitMQ:Port"];
+
+        var factory = new ConnectionFactory()
+        {
+            HostName = host,
+            Port = Convert.ToInt32(port)
+        };
+
+
+        _connection = factory.CreateConnection();
+    }
+
+    public Task PublishAsync(string queue, object message)
+    {
+        using var channel = _connection.CreateModel();
+
+        channel.QueueDeclare(queue, durable: true, exclusive: false);
+
+        var json = JsonSerializer.Serialize(message);
+        var body = Encoding.UTF8.GetBytes(json);
+
+        channel.BasicPublish("", queue, null, body);
+
+        return Task.CompletedTask;
+    }
+}

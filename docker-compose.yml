@@ -1,0 +1,45 @@
+
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+
+    command: >
+      azurite-blob
+      --blobHost 0.0.0.0
+      --blobPort 10000
+      --skipApiVersionCheck
+
+  document-service:
+    build:
+      context: .
+
+      dockerfile: src/DocFlow.DocumentService.Api/Dockerfile
+
+    ports:
+      - "5001:8080"
+
+    environment:
+      # ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Docker
+
+    depends_on:
+      - rabbitmq
+      - azurite

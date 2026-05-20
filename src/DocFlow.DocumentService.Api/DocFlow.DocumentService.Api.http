@@ -1,0 +1,18 @@
+@DocFlow.DocumentService.Api_HostAddress = http://localhost:5007
+
+### Example: Get all documents
+GET {{DocFlow.DocumentService.Api_HostAddress}}/documents
+Accept: application/json
+
+###
+
+### Example: Upload a document (adjust as needed)
+POST {{DocFlow.DocumentService.Api_HostAddress}}/documents
+Content-Type: application/json
+
+{
+  "name": "example.pdf",
+  "content": "base64-encoded-content"
+}
+
+###
