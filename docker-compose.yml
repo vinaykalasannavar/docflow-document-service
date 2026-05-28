@@ -1,5 +1,3 @@
-
-
 services:
 
   rabbitmq:
@@ -28,16 +26,15 @@ services:
       --skipApiVersionCheck
 
   document-service:
+    image: docflow-document-service
     build:
       context: .
-
       dockerfile: src/DocFlow.DocumentService.Api/Dockerfile
 
     ports:
       - "5001:8080"
 
     environment:
-      # ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_ENVIRONMENT: Docker
 
     depends_on:
