@@ -8,9 +8,10 @@ namespace DocFlow.DocumentService.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DocumentsController(IBlobService blobService, IMessagePublisher publisher, ILogger<DocumentsController> logger) : ControllerBase
+    public class DocumentsController(IBlobService blobService, IMessagePublisher publisher, ILogger<DocumentsController> logger, IConfiguration configuration) : ControllerBase
     {
         private readonly ILogger<DocumentsController> _logger = logger;
+        private readonly string _queueName = configuration["RabbitMQ:QueueName"] ?? "documents-uploaded-queue";
 
         [HttpPost("upload")]
         public async Task<IActionResult> Upload(IFormFile file)
@@ -22,9 +23,9 @@ namespace DocFlow.DocumentService.Api.Controllers
 
             using var stream = file.OpenReadStream();
 
-            _logger.LogInformation("Uploading file {FileName} to blob storage", fileName);
+            _logger.LogInformation("Attempting to upload file, FileName: {FileName} to blob storage", fileName);
             var blobUrl = await blobService.UploadAsync(fileName, stream);
-            _logger.LogInformation("File {FileName} uploaded to blob storage at {BlobUrl}", fileName, blobUrl);
+            _logger.LogInformation("Successfully uploaded file, FileName: {FileName} uploaded to blob storage, BlobUrl: {BlobUrl}", fileName, blobUrl);
 
             var message = new DocumentUploadedEvent
             {
@@ -33,7 +34,9 @@ namespace DocFlow.DocumentService.Api.Controllers
                 FileName = file.FileName
             };
 
-            await publisher.PublishAsync("document-uploaded", message);
+            _logger.LogInformation("Attempting to publish document uploaded event to Rabbit MQ  for documentId: {DocumentId}, fileName: {FileName}", message.DocumentId, fileName);
+            await publisher.PublishAsync(_queueName, message);
+            _logger.LogInformation("Successfully published event, documentId: {DocumentId}, fileName: {FileName}, URL: {BlobUrl}, and", message.DocumentId, fileName, blobUrl);
 
             return Ok(new { message = "Uploaded successfully", blobUrl });
         }
